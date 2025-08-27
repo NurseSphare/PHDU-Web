@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+    <title>Staff List</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #c1ddf2;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #1a97e7;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        button {
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+        }
+        #backBtn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #1a97e7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #backBtn:hover{
+            background-color: #ff2525;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Staff List</h2>
+
+<table id="staffTable">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- الموظفين سيتم إضافتهم بواسطة JS -->
+    </tbody>
+</table>
+
+<button id="backBtn">Back</button>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const staffTableBody = document.querySelector("#staffTable tbody");
+    let staffList = JSON.parse(localStorage.getItem("staffList")) || [];
+
+    function renderStaff() {
+        staffTableBody.innerHTML = "";
+        if (staffList.length === 0) {
+            staffTableBody.innerHTML = `<tr><td colspan="5">No staff added yet.</td></tr>`;
+        } else {
+            staffList.forEach((staff, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${staff.name}</td>
+                    <td>${staff.email}</td>
+                    <td>${staff.password}</td>
+                    <td>
+                        <button class="editBtn" data-index="${index}">Edit</button>
+                        <button class="deleteBtn" data-index="${index}">Delete</button>
+                    </td>
+                `;
+                staffTableBody.appendChild(row);
+            });
+        }
+        attachEvents();
+    }
+
+    function attachEvents() {
+        document.querySelectorAll(".deleteBtn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const index = btn.getAttribute("data-index");
+                if (confirm("هل أنت متأكد من حذف هذا الموظف؟")) {
+                    staffList.splice(index, 1);
+                    localStorage.setItem("staffList", JSON.stringify(staffList));
+                    renderStaff();
+                }
+            });
+        });
+
+        document.querySelectorAll(".editBtn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const index = btn.getAttribute("data-index");
+                const staff = staffList[index];
+
+                const newName = prompt("أدخل الاسم الجديد:", staff.name);
+                if (!newName) return;
+
+                const newEmail = prompt("أدخل البريد الإلكتروني الجديد:", staff.email);
+                if (!newEmail) return;
+
+                const newPassword = prompt("أدخل كلمة المرور الجديدة:", staff.password);
+                if (!newPassword) return;
+
+                staffList[index] = { name: newName, email: newEmail, password: newPassword };
+                localStorage.setItem("staffList", JSON.stringify(staffList));
+                renderStaff();
+            });
+        });
+    }
+
+    renderStaff();
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+        window.history.back();
+    });
+});
+</script>
+<script>
+  function displayUser() {
+    const userDisplay = document.getElementById("userDisplay"); // div أسفل nav
+    const loggedUser = localStorage.getItem("loggedUser");
+
+    if (loggedUser) {
+        userDisplay.textContent = "Logged in as: " + loggedUser;
+    } else {
+        userDisplay.textContent = "Not logged in";
+    }
+}
+
+// استدعاء الدالة عند تحميل الصفحة
+document.addEventListener("DOMContentLoaded", displayUser);
+
+</script>
+</body>
+</html>

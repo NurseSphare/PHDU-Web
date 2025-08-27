@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Employee Search with Animated Details</title>
+<style>
+  body { 
+    font-family: Arial, sans-serif; 
+    text-align: center; 
+    background-color: #f0f2f5; 
+    margin: 0; 
+    padding: 20px;
+  }
+
+  h2 { color: #333; }
+
+  input { 
+    padding: 10px; 
+    width: 300px; 
+    margin: 20px 0; 
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+    font-size: 16px;
+    outline: none;
+    transition: 0.3s;
+  }
+
+  input:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 8px rgba(0,123,255,0.3);
+  }
+
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .card {
+    background-color: #fff;
+    width: 200px;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: 0.3s;
+    cursor: pointer;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  }
+
+  .card h3 { margin: 0 0 10px 0; color: #007BFF; font-size: 18px; }
+  .card p { margin: 5px 0; color: #555; }
+
+  .no-results { color: #888; font-size: 18px; margin-top: 30px; }
+
+  /* Animated Modal */
+  .modal-overlay {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-box {
+    background: #fff;
+    padding: 30px 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    transform: scale(0.7);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-overlay.show .modal-box {
+    transform: scale(1);
+  }
+
+  .modal-box input {
+    width: 80%;
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .modal-box button {
+    padding: 10px 20px;
+    margin: 10px 5px 0 5px;
+    border: none;
+    background: #007BFF;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .modal-box button:hover {
+    background: #0056b3;
+  }
+
+  .modal-box h3 { color: #007BFF; margin-bottom: 10px; }
+  .modal-box p { color: #555; margin: 5px 0; }
+
+</style>
+</head>
+<body>
+
+<h2>Employee Search</h2>
+<input type="text" id="searchInput" placeholder="Enter Staff Number or Name">
+
+<div class="cards-container" id="cardsContainer"></div>
+
+<!-- Password Modal -->
+<div class="modal-overlay" id="passwordModal" onclick="closeModalOnClick(event,'passwordModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3>Enter Password</h3>
+    <input type="password" id="passwordInput" placeholder="Password">
+    <br>
+    <button id="submitPassword">Submit</button>
+    <button onclick="closeModal('passwordModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal-overlay" id="detailsModal" onclick="closeModalOnClick(event,'detailsModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3 id="detailName"></h3>
+    <p id="detailStaffNumber"></p>
+    <p id="detailEmail"></p>
+    <p id="detailPosition"></p>
+    <button onclick="closeModal('detailsModal')">Close</button>
+  </div>
+</div>
+
+<script>
+// Dummy data
+let staffData = [
+  { "Staff Number": "E001", "Name": "John Doe", "Email": "john@example.com", "Position": "Manager" },
+  { "Staff Number": "E002", "Name": "Jane Smith", "Email": "jane@example.com", "Position": "Developer" },
+  { "Staff Number": "E003", "Name": "Alice Brown", "Email": "alice@example.com", "Position": "Designer" },
+  { "Staff Number": "E004", "Name": "Bob Johnson", "Email": "bob@example.com", "Position": "Tester" }
+];
+
+let selectedEmployee = null;
+const correctPassword = "123";
+
+// Display employee cards
+function displayCards(data) {
+  const container = document.getElementById("cardsContainer");
+  container.innerHTML = "";
+
+  if(data.length===0){
+    container.innerHTML = `<p class="no-results">No results found</p>`;
+    return;
+  }
+
+  data.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h3>${item["Name"]}</h3><p>Staff Number: ${item["Staff Number"]}</p>`;
+    card.onclick = () => openPasswordModal(item);
+    container.appendChild(card);
+  });
+}
+
+// Display all cards initially
+displayCards(staffData);
+
+// Search functionality
+document.getElementById("searchInput").addEventListener("input", function(){
+  const query = this.value.toLowerCase().trim();
+  if(query==="") displayCards(staffData);
+  else{
+    const filtered = staffData.filter(item =>
+      (item["Staff Number"] && item["Staff Number"].toLowerCase().includes(query)) ||
+      (item["Name"] && item["Name"].toLowerCase().includes(query))
+    );
+    displayCards(filtered);
+  }
+});
+
+// Open password modal
+function openPasswordModal(employee){
+  selectedEmployee = employee;
+  document.getElementById("passwordInput").value = "";
+  const modal = document.getElementById("passwordModal");
+  modal.classList.add("show");
+}
+
+// Submit password
+document.getElementById("submitPassword").addEventListener("click", function(){
+  const pwd = document.getElementById("passwordInput").value;
+  if(pwd === correctPassword){
+    closeModal('passwordModal');
+    openDetailsModal(selectedEmployee);
+  } else {
+    alert("Incorrect password!");
+  }
+});
+
+// Open details modal
+function openDetailsModal(employee){
+  document.getElementById("detailName").innerText = employee["Name"];
+  document.getElementById("detailStaffNumber").innerText = "Staff Number: "+employee["Staff Number"];
+  document.getElementById("detailEmail").innerText = "Email: "+employee["Email"];
+  document.getElementById("detailPosition").innerText = "Position: "+employee["Position"];
+  const modal = document.getElementById("detailsModal");
+  modal.classList.add("show");
+}
+
+// Close modal
+function closeModal(id){
+  const modal = document.getElementById(id);
+  modal.classList.remove("show");
+}
+
+// Close modal if clicked outside box
+function closeModalOnClick(event, id){
+  if(event.target.id === id){
+    closeModal(id);
+  }
+}
+</script>
+
+</body>
+</html>

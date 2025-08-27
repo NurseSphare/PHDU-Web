@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+     <link rel="stylesheet" href="ExploreStyle.css">
+    <script src="login.js"></script>
+
+
+    <title>PHDU Admin - View Messages</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin-top:1rem; padding:0; background:#f4f4f4; color:#333;}
+        .sectionc { background:#f9f9f9;; color:rgb(10, 10, 10); text-align:center; padding:0px 0 ; }
+        .sectionc h1 { margin:0cm; }
+        main { max-width:900px; margin:40px auto; padding:0 20px; }
+        table { width:100%; border-collapse: collapse; background:white; }
+        tbody{color: #1f2937;font-size: small;}
+        th, td { padding:12px; border:1px solid #ddd; text-align:left; }
+        th { background:#0072b1; color:white; }
+        tr:nth-child(even) { background:#f9f9f9; }
+        .clear-btn { margin:10px 0; padding:10px 15px; background:#d9534f; color:white; border:none; border-radius:5px; cursor:pointer;}
+        .clear-btn:hover { background:#c9302c; }
+        .section-gap {height: 88.7px;            /* طول الفراغ */ background-color: #f9f9f9;}
+    </style>
+</head>
+<body>
+<header>   <!-- الهيدر -->
+ <img class="PHDULogo" src="Media/PHDU Logo.png" alt="PHDU Logo" >
+<nav class="Navigation">   <!--القسم مخصص للتنقل-->
+    <ul id="navMenu">    <!-- ليست بار -->    <!-- href يعني رابط-->
+
+<li class="active"><a href="Main.html">Home</a></li>
+
+<div class="dropdown" style="float: inherit;">
+      <li class="Education"><a href="#Education">Education</a></li>
+<div class="dropdown-content">
+      <a href="#Learning">Learning</a>
+      <a href="#CompetencyTools">Competency Tools</a>
+      <a href="#Updates">Updates</a>
+</div>
+</div>
+<div class="dropdown2" style="float: inherit;">
+    <li class="ClinicalResources"><a href="#ClinicalResources">Clinical Resources</a></li>
+<div class="dropdown-content2">
+        <a href="#Guidelines">Guidelines</a>
+        <a href="#Policies">Policies</a>
+        <a href="#Documents">Documents</a>
+        <a href="#QuickReferences">Quick References</a>
+</div>
+</div>
+
+<div class="dropdown2" style="float: inherit;">
+    <li class="HospitalOperations"><a href="#HospitalOperations">Hospital Operations</a></li>
+<div class="dropdown-content2">
+        <a href="#AdmissionTransfer">Admission and Transfer</a>
+        <a href="#DutyRoster">Duty Roster</a>
+        <a href="#Inventory">Inventory</a>
+        <a href="#WorkOrder">Work Order</a>
+        <a href="#CSSD">CSSD</a>
+        <a href="#Loan">Loan</a>
+</div>
+</div>
+<div class="dropdown2" style="float: inherit;">
+    <li class="Quality&Safety"><a href="#Quality&Safety">Quality and Safety</a></li>
+<div class="dropdown-content2">
+        <a href="#Audit">Audit</a>
+        <a href="#Statistics">Statistics</a>
+        <a href="#Ejada">Ejada</a>
+        <a href="#DisasterPlan">Disaster Plan</a>
+        <a href="#SafetyEvent">Safety Event</a>
+</div>
+</div>
+<div class="dropdown2" style="float: inherit;">
+    <li class="NursingHR"><a href="#NursingHR">Nursing HR</a></li>
+<div class="dropdown-content2"id="NursingHR">
+        <a href="#PersonalData&TrainingRecords">Personal Data and Training Records</a>
+        <a href="#Dashboard">Dashboard</a>
+        <a href="#PerformanceandCompetency">Performance and Competency</a>
+        <a href="#ReportsandTracking">Reports and Tracking</a>
+        <a href="#Other">Other</a>
+          <ul id="hrDropdown">
+            <!-- Staff سيضاف هنا ديناميكيًا -->
+        </ul>
+</div>
+
+</div>
+
+    <li><a href="About.html">About Me</a></li>
+
+<!-- زر Account -->
+<li style="float: right; margin-left: 10px; position:relative;">
+  <a href="javascript:void(0)" class="account-btn" id="accountBtn">Account </a>
+  <ul id="accountMenu">
+    <li><a href="javascript:void(0)" id="loginOption">Login</a></li>
+    <li><a href="javascript:void(0)" id="logoutOption">Logout</a></li>
+  </ul>
+</li>
+<div id="logoContainer">
+    <div id="userDisplay"></div>
+</div>
+
+<!-- Login Modal HTML -->
+<div id="loginModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+    background-color: rgba(0, 0, 0, 0.5); justify-content:center; align-items:center; font-family:'Lilita One', sans-serif; z-index:1000;">
+    <div style="background-color:white; padding:20px; border-radius:10px; width:300px; text-align:center; position:relative;">
+        <span id="closeModal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-weight:bold;">&times;</span>
+        <h2>Login</h2>
+        <input type="text" id="usernameInput" placeholder="Username" style="width:90%; padding:5px; margin-top:10px;"><br><br>
+        <input type="password" id="passwordInput" placeholder="Password" style="width:90%; padding:5px;"><br><br>
+        <button id="submitLogin" style="padding:5px 10px;">Login</button>
+    </div>
+</div>
+
+<!-- Welcome Box Modal -->
+<div id="welcomeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+    background-color: rgba(0,0,0,0.5); justify-content:center; align-items:center; font-family: 'Lilita One', sans-serif;">
+    <div style="background-color:white; padding:20px; border-radius:10px; width:300px; text-align:center; position:relative;">
+        <span id="closeWelcome" style="position:absolute; top:10px; right:15px; cursor:pointer; font-weight:bold;">&times;</span>
+        <h2 id="welcomeMessage" style="font-weight: normal;"></h2>
+    </div>
+</div>
+<!-- مودال Add Staff -->
+<div id="addStaffModal" class="modal">
+    <div class="modal-content">
+        <span id="closeAddStaff" class="close">&times;</span>
+        <h2>Add New Staff</h2>
+        <form id="addStaffForm">
+            <div class="form-group">
+                <label for="staffName">Name:</label>
+                <input type="text" id="staffName" placeholder="Enter full name" required>
+            </div>
+            <div class="form-group">
+                <label for="staffEmail">Email:</label>
+                <input type="email" id="staffEmail" placeholder="Enter email" required>
+            </div>
+            <div class="form-group">
+                <label for="staffPassword">Password:</label>
+                <input type="password" id="staffPassword" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="submit-btn">Add Staff</button>
+        </form>
+        <button id="viewStaffBtn">View All Staff</button>
+    </div>
+</div>
+
+</ul>
+</nav>
+    </ul>
+
+</nav>
+ </header>
+
+<div class="section-gap"></div>
+<section class="sectionc">
+    
+        <h1 class="PHDUAdmin">PHDU Admin - View Messages</h1>
+    
+
+    <main>
+        <button class="clear-btn" id="clearMessages">Clear All Messages</button>
+
+        <table id="messagesTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- الرسائل ستظهر هنا بواسطة JS -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        function loadMessages() {
+            const tbody = document.querySelector("#messagesTable tbody");
+            tbody.innerHTML = "";
+            const messages = JSON.parse(localStorage.getItem("phduMessages") || "[]");
+            messages.forEach((msg, index) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${index+1}</td>
+                    <td>${msg.name}</td>
+                    <td>${msg.email}</td>
+                    <td>${msg.message}</td>
+                    <td>${msg.date}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById("clearMessages").addEventListener("click", () => {
+            if(confirm("Are you sure you want to clear all messages?")) {
+                localStorage.removeItem("phduMessages");
+                loadMessages();
+            }
+        });
+
+        // تحميل الرسائل عند فتح الصفحة
+        loadMessages();
+    </script><div class="section-gap"></div>
+    </body>
+        <!-- Footer Section -->
+<footer style="background-color: #1f2937; color: #f3f4f6; padding: 40px 20px; font-family: Arial, sans-serif;">
+  <div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; text-align: left;">
+    
+    <!-- About Section -->
+    <div style="flex: 1; min-width: 200px;">
+      <h3 style="margin-bottom: 10px;">About NurseSphere</h3>
+      <p style="line-height: 1.6; font-size: small;">
+        NurseSphere is your go-to platform for nursing <br>education, resources, and professional updates.<br> Empowering healthcare staff with knowledge <br>and tools for excellence in practice.
+      </p>
+    </div>
+
+    <!-- Quick Links -->
+<div style="flex: 1; min-width: 200px;">
+  <h3 style="margin-bottom: 10px;">Quick Links</h3>
+  <ul class="Footer"  style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px;">
+    <li style="width: 45%;"><a href="#Education" style="color: #3477ff; text-decoration: none; font-weight: bold; font-size: small;">ُEducation</a></li>
+    <li style="width: 45%;"><a href="#ClinicalResources" style="color: #3477ff; text-decoration: none; font-weight: bold; font-size: small;">Clinical Resources</a></li>
+    <li style="width: 45%;"><a href="#HospitalOperations" style="color: #3477ff; text-decoration: none; font-weight: bold; font-size: small;">Hospital Operations</a></li>
+    <li style="width: 45%;"><a href="#QualityandSafety" style="color: #3477ff; text-decoration: none; font-weight: bold; font-size: small;">Quality and Safety</a></li>
+    <li style="width: 45%;"><a href="#NursingHR" style="color: #3477ff; text-decoration: none; font-weight: bold; font-size: small;">Nursing HR</a></li>
+    <li style="width: 45%;"><a href="About.html" style="color: #3477ff; text-decoration: none; font-weight: bold; font-size: small;">About me</a></li>
+  </ul>
+</div>
+
+
+    <!-- Contact -->
+    <div style="flex: 1; min-width: 200px;">
+      <h3 style="margin-bottom: 10px;">Contact Us</h3>
+      <p>Email: <a href="mailto:info@nursesphere.com" style="color: #f3f4f6; text-decoration: none;">info@nursesphere.com</a></p>
+      <p>Phone: +968 1234 5678</p>
+      <p>Address: Royal Hospital, Oman</p>
+    </div>
+
+  </div>
+
+  <div style="text-align: center; margin-top: 30px; font-size: 14px; color: #9ca3af;">
+    &copy; 2025 NurseSphere. All rights reserved.
+  </div>
+</footer> 
+</html>

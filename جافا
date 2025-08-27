@@ -1,0 +1,212 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const adminUser = "Asma";
+    const adminPass = "1234";
+
+    // العناصر الرئيسية
+    const loginModal = document.getElementById("loginModal");
+    const closeModal = document.getElementById("closeModal");
+    const submitLogin = document.getElementById("submitLogin");
+    const usernameInput = document.getElementById("usernameInput");
+    const passwordInput = document.getElementById("passwordInput");
+
+    const welcomeModal = document.getElementById("welcomeModal");
+    const welcomeMessage = document.getElementById("welcomeMessage");
+    const closeWelcome = document.getElementById("closeWelcome");
+
+    const hrDropdown = document.getElementById("hrDropdown");
+    const userDisplay = document.getElementById("userDisplay");
+
+    const addStaffModal = document.getElementById("addStaffModal");
+    const closeAddStaff = document.getElementById("closeAddStaff");
+    const addStaffForm = document.getElementById("addStaffForm");
+
+    const viewStaffBtn = document.getElementById("viewStaffBtn");
+
+    // --- زر Account مع Dropdown ---
+    const accountBtn = document.getElementById("accountBtn");
+    const accountMenu = document.getElementById("accountMenu");
+    const loginOption = document.getElementById("loginOption");
+    const logoutOption = document.getElementById("logoutOption");
+
+    // --- فتح وغلق المودالات ---
+    closeModal?.addEventListener("click", () => loginModal.style.display = "none");
+    closeWelcome?.addEventListener("click", () => welcomeModal.style.display = "none");
+    closeAddStaff?.addEventListener("click", () => addStaffModal.style.display = "none");
+
+    window.addEventListener("click", (e) => {
+        if (e.target === addStaffModal) addStaffModal.style.display = "none";
+        if (e.target !== accountBtn && e.target.closest("#accountMenu") === null) {
+            accountMenu.style.display = "none";
+        }
+    });
+
+    // --- Dropdown الحساب ---
+    accountBtn?.addEventListener("click", () => {
+        accountMenu.style.display = accountMenu.style.display === "block" ? "none" : "block";
+    });
+
+    loginOption?.addEventListener("click", () => {
+        loginModal.style.display = "flex";
+        accountMenu.style.display = "none";
+    });
+
+    logoutOption?.addEventListener("click", () => {
+        localStorage.removeItem("loggedUser");
+        localStorage.removeItem("isAdmin");
+        userDisplay.innerText = "";
+        const staffItem = document.getElementById("staff");
+        if (staffItem) staffItem.remove();
+        alert("تم تسجيل الخروج!");
+        updateAccountMenu();
+        accountMenu.style.display = "none";
+    });
+
+    // --- تسجيل الدخول ---
+    submitLogin?.addEventListener("click", () => {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!username || !password) {
+            alert("يرجى إدخال اسم المستخدم وكلمة المرور!");
+            return;
+        }
+
+        let isAdmin = (username === adminUser && password === adminPass);
+        let staffList = JSON.parse(localStorage.getItem("staffList")) || [];
+        let staffUser = staffList.find(staff => 
+            (staff.name === username || staff.email === username) && staff.password === password
+        );
+
+        if (!isAdmin && !staffUser) {
+            alert("خطأ: المستخدم غير موجود أو كلمة المرور غير صحيحة!");
+            return;
+        }
+
+        localStorage.setItem("loggedUser", isAdmin ? adminUser : staffUser.name);
+        localStorage.setItem("isAdmin", isAdmin ? "true" : "false");
+
+        loginModal.style.display = "none";
+        usernameInput.value = "";
+        passwordInput.value = "";
+
+        userDisplay.innerText = `(Welcome ${isAdmin ? "Admin " + username : staffUser.name})`;
+
+        welcomeMessage.innerText = isAdmin 
+            ? `Welcome, Admin ${username}!`
+            : `Welcome, ${staffUser.name}!`;
+        welcomeModal.style.display = "flex";
+        setTimeout(() => welcomeModal.style.display = "none", 3000);
+
+        // إضافة خيار Add Staff إذا كان Admin
+        if (isAdmin) {
+            if (!document.getElementById("staff")) {
+                const newItem = document.createElement("li");
+                newItem.id = "staff";
+                const link = document.createElement("a");
+                link.href = "javascript:void(0)";
+                link.innerText = "Add Staff (Admin)";
+                newItem.appendChild(link);
+                hrDropdown.appendChild(newItem);
+
+                link.addEventListener("click", () => addStaffModal.style.display = "flex");
+            }
+        } else {
+            const staffItem = document.getElementById("staff");
+            if (staffItem) staffItem.remove();
+        }
+
+        updateAccountMenu();
+    });
+
+    // --- إضافة الموظفين ---
+    addStaffForm?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("staffName").value.trim();
+        const email = document.getElementById("staffEmail").value.trim();
+        const password = document.getElementById("staffPassword").value.trim();
+
+        if (!name || !email || !password) {
+            alert("يرجى ملء جميع الحقول!");
+            return;
+        }
+
+        let staffList = JSON.parse(localStorage.getItem("staffList")) || [];
+
+        if (staffList.some(staff => staff.email === email)) {
+            alert("هذا البريد مستخدم بالفعل!");
+            return;
+        }
+
+        staffList.push({ name, email, password });
+        localStorage.setItem("staffList", JSON.stringify(staffList));
+
+        alert(`تم إضافة الموظف:\nالاسم: ${name}\nالبريد: ${email}`);
+        addStaffModal.style.display = "none";
+        addStaffForm.reset();
+    });
+
+    // --- زر عرض الموظفين ---
+    viewStaffBtn?.addEventListener("click", () => {
+        window.location.href = "Login.html";
+    });
+
+    // --- تحديث واجهة الحساب حسب حالة المستخدم ---
+    function updateAccountMenu() {
+        const currentUser = localStorage.getItem("loggedUser");
+        const currentIsAdmin = localStorage.getItem("isAdmin") === "true";
+
+        if (currentUser) {
+            userDisplay.innerText = `(Welcome ${currentIsAdmin ? "Admin " + currentUser : currentUser})`;
+            loginOption.style.display = "none";
+            logoutOption.style.display = "block";
+
+            if (currentIsAdmin && !document.getElementById("staff")) {
+                const newItem = document.createElement("li");
+                newItem.id = "staff";
+                const link = document.createElement("a");
+                link.href = "javascript:void(0)";
+                link.innerText = "Add Staff (Admin)";
+                newItem.appendChild(link);
+                hrDropdown.appendChild(newItem);
+
+                link.addEventListener("click", () => addStaffModal.style.display = "flex");
+            }
+        } else {
+            // المستخدم غير موجود → لا يظهر المودال تلقائيًا
+            userDisplay.innerText = "";
+            loginOption.style.display = "block";
+            logoutOption.style.display = "none";
+            loginModal.style.display = "none"; // مهم جدًا
+        }
+    }
+
+    // --- عند تحميل الصفحة ---
+    updateAccountMenu();
+});
+
+// ----------------------------
+
+// احصل على عناصر المودال والزر وX
+const modal = document.getElementById("loginModal");
+const btn = document.getElementById("loginBtn"); // الزر الذي يفتح المودال
+const span = document.getElementsByClassName("close")[0];
+
+// عند تحميل الصفحة، تأكد أن المودال مخفي
+modal.style.display = "none";
+
+// فتح المودال عند الضغط على الزر
+btn?.addEventListener("click", () => {
+    modal.style.display = "flex"; // استخدام flex لعرضه بشكل جميل
+});
+
+// إغلاق المودال عند الضغط على X
+span?.addEventListener("click", () => {
+    modal.style.display = "none";
+});
+
+// إغلاق المودال عند الضغط خارج محتواه
+window.addEventListener("click", (event) => {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+});
