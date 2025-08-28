@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="Styles.css">
+    <link rel="stylesheet" href="StylesPhone.css">
     <script src="login.js"></script>
     <script src="Animated.js"></script>
     <!-- فيديو الخلفية-->
@@ -33,7 +34,7 @@
 <nav class="Navigation">   <!--القسم مخصص للتنقل-->
     <ul id="navMenu">    <!-- ليست بار -->    <!-- href يعني رابط-->
 
-<li class="active"><a href="Main.html">Home</a></li>
+<li class="active"><a href="index.html">Home</a></li>
 
 <div class="dropdown" style="float: inherit;">
       <li class="Education"><a href="#Education">Education</a></li>
@@ -82,9 +83,7 @@
         <a href="#PerformanceandCompetency">Performance and Competency</a>
         <a href="#ReportsandTracking">Reports and Tracking</a>
         <a href="#Other">Other</a>
-          <ul id="hrDropdown">
-            <!-- Staff سيضاف هنا ديناميكيًا -->
-        </ul>
+
 </div></div>
 
 <!-- Admin Control (مخفي افتراضياً) -->
@@ -110,7 +109,7 @@
   </ul>
 </li>
 <div id="logoContainer">
-    <div id="userDisplay"></div>
+    <div id="userDisplay" ></div>
 </div>
 
 <!-- Login Modal HTML -->
@@ -161,6 +160,22 @@
 </nav>
     </ul>
 </nav>
+  <div class="toggle-btn">☰</div>
+
+
+<script>
+// JS لتفعيل الهامبرغر على الهاتف
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.querySelector(".toggle-btn");
+  const nav = document.querySelector(".Navigation");
+
+  toggleBtn.addEventListener("click", () => {
+    nav.classList.toggle("show");
+  });
+});
+
+
+</script>
 
 </header>
 
@@ -306,7 +321,7 @@ fetch(sheetUrl)
     <!-- About Section -->
     <div style="flex: 1; min-width: 200px;">
       <h3 style="margin-bottom: 10px;">About NurseSphere</h3>
-      <p style="line-height: 1.6; font-size: small;">
+      <p style="line-height: 1.6; font-size: small;" class="AbP">
         NurseSphere is your go-to platform for nursing <br>education, resources, and professional updates.<br> Empowering healthcare staff with knowledge <br>and tools for excellence in practice.
       </p>
     </div>
@@ -348,4 +363,3 @@ fetch(sheetUrl)
 </html>
 
 <head>
-
